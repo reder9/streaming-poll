@@ -1,0 +1,30 @@
+{
+  "title": "Fortnite Challenge Poll",
+  "description": "Cast your vote on what kind of challenge I should tackle in the next round! Just type the number of your choice in chat — the most-voted wins!",
+  "options": [
+    { "id": "option1", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option2", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option3", "label": "Capybaras", "description": "The chillest rodent" },
+    { "id": "option4", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option5", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option6", "label": "Capybaras", "description": "The chillest rodent" },
+    { "id": "option7", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option8", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option9", "label": "Capybaras", "description": "The chillest rodent" },
+    { "id": "option10", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option11", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option12", "label": "Capybaras", "description": "The chillest rodent" },
+    { "id": "option13", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option14", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option15", "label": "Capybaras", "description": "The chillest rodent" },
+    { "id": "option16", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option17", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option18", "label": "Capybaras", "description": "The chillest rodent" },
+    { "id": "option19", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option20", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option21", "label": "Capybaras", "description": "The chillest rodent" },
+    { "id": "option22", "label": "Cats", "description": "Fluffy overlords" },
+    { "id": "option23", "label": "Dogs", "description": "Good boys and girls" },
+    { "id": "option24", "label": "Capybaras", "description": "The chillest rodent" }
+  ]
+}
