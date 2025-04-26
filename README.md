@@ -1,19 +1,19 @@
-# 🎉 Live Twitch Poll Viewer
+# 🎉 Live Poll Viewer (Twitch + TikTok Ready)
 
-This is a real-time web-based polling app that listens to chat messages from a Twitch channel and displays the results visually on a stylish, responsive webpage. It also includes simulation and reset tools, making it great for streamers to engage with their audience during livestreams.
+This is a real-time web-based polling app that listens to chat messages from Twitch **and** TikTok channels and displays the results visually on a stylish, responsive webpage. It also includes simulation and reset tools, making it great for streamers to engage with their audience during livestreams.
 
-> 💡 This is built to eventually support TikTok and other platforms for unified live voting!
+> 💡 Already supports TikTok and Twitch out of the box!
 
 ---
 
 ## ✨ Features
 
-- 🔴 Real-time vote tracking from Twitch chat  
-- 📊 Responsive UI powered by Tailwind CSS  
-- 🧠 Configurable poll options via `poll.json`  
-- 🧪 Simulate votes locally  
-- 🔄 Reset votes at any time  
-- 🔐 Environment-based credential handling  
+- 🔴 Real-time vote tracking from **Twitch** and **TikTok**
+- 📊 Responsive UI powered by Tailwind CSS and GSAP animations
+- 🧠 Configurable poll options via `poll.json`
+- 🧪 Simulate votes locally
+- 🔄 Reset votes at any time (with wipe and confetti animations)
+- 🔐 Environment-based credential handling
 
 ---
 
@@ -23,10 +23,11 @@ This is a real-time web-based polling app that listens to chat messages from a T
 .
 ├── public/
 │   ├── index.html      # Frontend UI
-│   └── poll.json       # Defines poll options
-├── server.js           # Express + tmi.js server
+│   ├── poll.json       # Defines poll options
+│   └── confetti.png    # Confetti effect image
+├── server.js           # Express + chat integration
 ├── config.js           # Loads .env credentials
-├── .env                # Your Twitch creds (ignored by git)
+├── .env                # Your Twitch/TikTok creds (ignored by git)
 ├── package.json
 └── README.md
 ```
@@ -38,8 +39,8 @@ This is a real-time web-based polling app that listens to chat messages from a T
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/yourusername/live-twitch-poll.git
-cd live-twitch-poll
+git clone https://github.com/yourusername/live-poll-viewer.git
+cd live-poll-viewer
 ```
 
 ### 2. Install dependencies
@@ -50,15 +51,18 @@ npm install
 
 ### 3. Create a `.env` file
 
-Add your Twitch bot credentials in a `.env` file at the root:
+Add your Twitch/TikTok bot credentials in a `.env` file at the root:
 
 ```env
 TWITCH_USERNAME=your_twitch_bot_username
 TWITCH_OAUTH=oauth:your_oauth_token
 TWITCH_CHANNEL=your_channel_name
+
+TIKTOK_USERNAME=your_tiktok_bot_username
+TIKTOK_SESSION_ID=your_session_id
 ```
 
-> 🔐 Your OAuth token should start with `oauth:` — get it from [https://twitchapps.com/tmi/](https://twitchapps.com/tmi/)
+> 🔐 Get your Twitch OAuth token at [https://twitchapps.com/tmi/](https://twitchapps.com/tmi/)
 
 ### 4. Create a `poll.json` file in the `public` folder
 
@@ -73,7 +77,7 @@ Example structure:
 }
 ```
 
-Make sure the IDs here match what Twitch chat will vote on (e.g., by typing `1`, `2`, etc.).
+IDs should match what chat users will type (`1`, `2`, etc.).
 
 ---
 
@@ -85,44 +89,41 @@ Start the server locally:
 node server.js
 ```
 
-Now open your browser and go to:
+Open your browser to:
 
 ```
 http://localhost:3000
 ```
 
-You’ll see the poll interface, and any Twitch chat message saying `1`, `2`, etc. will increment the corresponding vote.
+Votes from both Twitch and TikTok chats will appear in real-time.
 
 ---
 
 ## 💬 How Voting Works
 
-- Twitch viewers type `1`, `2`, etc. in chat.
-- The bot watches chat and counts valid votes based on the `poll.json` file.
-- Frontend updates in real time using WebSockets.
-
-> Eventually, TikTok support will be added alongside Twitch!
+- Viewers type `1`, `2`, etc. in Twitch or TikTok chat.
+- The bot counts votes and updates the UI live using WebSockets.
 
 ---
 
 ## 🔁 Dev Tools
 
-- **Simulate Vote:** Adds a random vote for testing  
-- **Reset Poll:** Clears all vote counts and updates UI  
-
-These buttons appear in the lower-right corner of the interface.
+- **Simulate Vote:** Adds a random vote for testing
+- **Reset Poll:** Clears all votes and triggers a page wipe
 
 ---
 
 ## 📦 Environment Variables Summary
 
-| Key               | Description                         |
-|------------------|-------------------------------------|
-| `TWITCH_USERNAME` | Your bot's Twitch username          |
-| `TWITCH_OAUTH`    | OAuth token (get from Twitch Apps)  |
-| `TWITCH_CHANNEL`  | Channel to connect and listen to    |
+| Key                 | Description                          |
+|---------------------|--------------------------------------|
+| `TWITCH_USERNAME`   | Your Twitch bot username             |
+| `TWITCH_OAUTH`      | OAuth token for Twitch               |
+| `TWITCH_CHANNEL`    | Twitch channel to listen to          |
+| `TIKTOK_USERNAME`   | Your TikTok username or bot name     |
+| `TIKTOK_SESSION_ID` | Your TikTok session (cookie string)  |
 
-> ⚠️ Be sure to include `.env` in your `.gitignore` to protect your credentials.
+> ⚠️ Be sure to `.gitignore` your `.env` file.
 
 ---
 
@@ -130,21 +131,21 @@ These buttons appear in the lower-right corner of the interface.
 
 - [Node.js](https://nodejs.org/)
 - [Express](https://expressjs.com/)
-- [tmi.js](https://tmijs.com/)
+- [tmi.js](https://tmijs.com/) – Twitch chat
 - [Socket.IO](https://socket.io/)
 - [Tailwind CSS](https://tailwindcss.com/)
+- [GSAP](https://greensock.com/gsap/) – animations
 
 ---
 
 ## 🧩 Future Plans
 
-- 🟣 Add TikTok integration  
-- 🧠 Live config switching via web UI  
-- 🎨 Enhanced UI with progress bars and animations  
-- 📺 OBS overlay support  
+- 📡 Better mobile TikTok support
+- 🧠 Live config editor (in browser)
+- 🖼️ Stream overlays and custom themes
 
 ---
 
 ## 📄 License
 
-MIT – feel free to fork and customize for your stream!
+MIT – Fork it, improve it, use it on your stream! 🎉
