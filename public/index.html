@@ -27,6 +27,11 @@
       pointer-events: none;
       z-index: 50;
     }
+
+    .top-vote {
+      border: 3px solid #34d399; /* emerald-400 */
+      box-shadow: 0 0 10px #34d399;
+    }
   </style>
 </head>
 <body class="bg-zinc-900 text-white min-h-screen flex flex-col overflow-hidden">
@@ -103,6 +108,27 @@
           launchConfetti();
         }
       }
+      highlightTopVotes(); // 🟢 NEW: call to highlight
+    }
+
+    function highlightTopVotes() {
+      const votes = Object.keys(testPollData).map(id => ({
+        id,
+        count: parseInt(document.getElementById(id)?.textContent || '0')
+      }));
+
+      const maxVote = Math.max(...votes.map(v => v.count));
+
+      votes.forEach(vote => {
+        const row = document.getElementById(`row-${vote.id}`);
+        if (row) {
+          if (vote.count === maxVote && maxVote > 0) {
+            row.classList.add('top-vote');
+          } else {
+            row.classList.remove('top-vote');
+          }
+        }
+      });
     }
 
     function playWipe() {
@@ -131,7 +157,7 @@
         confetti.src = '/confetti.png';
         confetti.className = 'confetti';
 
-        const size = 16 + Math.random() * 32; // size between 16px and 48px
+        const size = 16 + Math.random() * 32;
         confetti.style.width = `${size}px`;
         confetti.style.height = `${size}px`;
 
@@ -159,7 +185,6 @@
         updateVote(id, 0, true);
       });
       socket.emit('resetPoll');
-
       playWipe();
     });
 
