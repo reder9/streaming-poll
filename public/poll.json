@@ -4,17 +4,15 @@
   "options": [
     { "id": "option1", "label": "Grey Guns Only", "description": "🔘 Only grey loot allowed!" },
     { "id": "option2", "label": "One Chest Challenge", "description": "📦 One chest = all you get!" },
-    { "id": "option3", "label": "Gun Rainbow", "description": "🌈 Upgrade colors with each elim!" },
-    { "id": "option4", "label": "No Guns", "description": "🚑 Heals & movement only!" },
-    { "id": "option5", "label": "Heals Only", "description": "💉 Only heals, no weapons!" },
+    { "id": "option3", "label": "No Chest Challenge", "description": "🚫 No chests — ground loot only!" },
+    { "id": "option4", "label": "Gun Rainbow", "description": "🌈 Upgrade colors with each elim!" },
+    { "id": "option5", "label": "No Guns", "description": "🚑 Heals & movement only!" },
     { "id": "option6", "label": "Movement Only", "description": "🛹 Bounce, fly, and sprint — no guns!" },
     { "id": "option7", "label": "Top 10 Then Weapons", "description": "🔟 Hide until top 10 to gear up!" },
     { "id": "option8", "label": "Gun Color = Skin Color", "description": "🎨 Match your gun to your drip!" },
-    { "id": "option9", "label": "No Chest Challenge", "description": "🚫 No chests — ground loot only!" },
-    { "id": "option10", "label": "No Matching Weapons", "description": "🔫 Only one type of weapon allowed!" },
-    { "id": "option11", "label": "Fishing Loot Only", "description": "🎣 Gotta fish your entire loadout!" },
-    { "id": "option12", "label": "No Reload", "description": "♻️ Outta ammo? Drop it and grab a new one!" },
-    { "id": "option13", "label": "Loadout Swap", "description": "🔄 Steal your enemy’s full loadout!" },
-    { "id": "option14", "label": "Emote Traversals Only", "description": "🕺 Only move using traversal emotes!" }
+    { "id": "option9", "label": "Fishing Loot Only", "description": "🎣 Gotta fish your entire loadout!" },
+    { "id": "option10", "label": "No Reload", "description": "♻️ Outta ammo? Drop it and grab a new one!" },
+    { "id": "option11", "label": "Loadout Swap", "description": "🔄 Steal your enemy’s full loadout!" },
+    { "id": "option12", "label": "Emote Traversals Only", "description": "🕺 Only move using traversal emotes!" }
   ]
 }

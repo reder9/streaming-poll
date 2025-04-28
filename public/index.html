@@ -63,11 +63,11 @@
   <!-- Poll Options -->
   <div id="optionsContainer" class="flex-1 overflow-auto px-4 pb-28"></div>
 
-  <!-- Buttons -->
-  <div class="fixed bottom-4 right-4 flex gap-2 z-10">
-    <button id="simulateBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded shadow">
+  <!-- Reset Button (Always Visible) -->
+  <div class="fixed top-4 right-4 z-10">
+    <!-- <button id="simulateBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded shadow">
       Simulate Vote
-    </button>
+    </button> -->
     <button id="resetBtn" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded shadow">
       Reset Poll
     </button>
@@ -194,11 +194,7 @@
       });
     }
 
-    // Socket listeners
-    socket.on('updatePoll', data => {
-      Object.keys(data).forEach(key => updateVote(key, data[key]));
-    });
-
+    // Always active reset button
     document.getElementById('resetBtn').addEventListener('click', () => {
       Object.keys(testPollData).forEach(id => {
         testPollData[id] = 0;
@@ -208,11 +204,9 @@
       playWipe();
     });
 
-    document.getElementById('simulateBtn').addEventListener('click', () => {
-      const keys = Object.keys(testPollData);
-      const pick = keys[Math.floor(Math.random() * keys.length)];
-      testPollData[pick]++;
-      updateVote(pick, testPollData[pick]);
+    // Socket listener
+    socket.on('updatePoll', data => {
+      Object.keys(data).forEach(key => updateVote(key, data[key]));
     });
   </script>
 </body>
