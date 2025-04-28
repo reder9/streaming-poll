@@ -1,6 +1,6 @@
 {
   "title": "Fortnite Challenge Poll",
-  "description": "🎯 Pick my next crazy Fortnite challenge! Vote by typing the number in chat — wildest wins!",
+  "description": "🎯 Pick my next crazy Fortnite challenge! Vote by typing the number in chat!",
   "options": [
     { "id": "option1", "label": "Grey Guns Only", "description": "🔘 Only grey loot allowed!" },
     { "id": "option2", "label": "One Chest Challenge", "description": "📦 One chest = all you get!" },
