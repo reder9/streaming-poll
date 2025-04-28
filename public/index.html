@@ -8,57 +8,62 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <style>
-  .vote-count {
-    @apply text-white bg-zinc-700 text-lg font-bold px-4 py-1 rounded text-center;
-    min-width: 3rem;
-  }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #18181b; /* Tailwind zinc-900 */
+      color: white;
+    }
 
-  .vote-animate {
-    animation: flashColor 0.6s ease-in-out;
-  }
+    .vote-count {
+      @apply text-white bg-zinc-700 text-lg font-bold px-4 py-1 rounded text-center;
+      min-width: 3rem;
+      display: inline-block;
+    }
 
-  @keyframes flashColor {
-    0%   { background-color: #9333ea; }
-    100% { background-color: #3f3f46; }
-  }
+    .vote-animate {
+      animation: flashColor 0.6s ease-in-out;
+    }
 
-  .confetti {
-    position: fixed;
-    pointer-events: none;
-    z-index: 50;
-  }
+    @keyframes flashColor {
+      0%   { background-color: #9333ea; }
+      100% { background-color: #3f3f46; }
+    }
 
-  /* 🟢 Updated top-vote style to pulse */
-  .top-vote {
-    border: 3px solid #34d399; /* emerald-400 */
-    box-shadow: 0 0 10px #34d399;
-    animation: pulseGlow 2s infinite;
-  }
-
-  @keyframes pulseGlow {
-    0% {
+    .top-vote {
+      border: 3px solid #34d399; /* emerald-400 */
       box-shadow: 0 0 10px #34d399;
+      animation: pulseGlow 2s infinite;
     }
-    50% {
-      box-shadow: 0 0 20px #34d399, 0 0 30px #34d399;
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 10px #34d399; }
+      50% { box-shadow: 0 0 20px #34d399, 0 0 30px #34d399; }
+      100% { box-shadow: 0 0 10px #34d399; }
     }
-    100% {
-      box-shadow: 0 0 10px #34d399;
+
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 50;
     }
-  }
-</style>
+  </style>
 </head>
-<body class="bg-zinc-900 text-white min-h-screen flex flex-col overflow-hidden">
-  <div class="flex-none px-4 py-6 text-center">
-    <div id="pollHeader" class="flex-none px-4 py-6 text-center">
-      <h1 id="pollTitle" class="text-3xl font-bold"></h1>
-      <p id="pollDesc" class="text-zinc-400 mt-1"></p>
-    </div>
+
+<body class="flex flex-col min-h-screen">
+  <!-- Header -->
+  <div class="flex-none px-4 py-4 text-center">
+    <h1 id="pollTitle" class="text-3xl font-bold"></h1>
+    <p id="pollDesc" class="text-zinc-400 mt-1"></p>
   </div>
 
+  <!-- Poll Options -->
   <div id="optionsContainer" class="flex-1 overflow-auto px-4 pb-28"></div>
 
-  <!-- Simulate & Reset Buttons -->
+  <!-- Buttons -->
   <div class="fixed bottom-4 right-4 flex gap-2 z-10">
     <button id="simulateBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded shadow">
       Simulate Vote
@@ -122,7 +127,7 @@
           launchConfetti();
         }
       }
-      highlightTopVotes(); // 🟢 NEW: call to highlight
+      highlightTopVotes();
     }
 
     function highlightTopVotes() {
@@ -145,6 +150,30 @@
       });
     }
 
+    function launchConfetti() {
+      for (let i = 0; i < 8; i++) {
+        const confetti = document.createElement('img');
+        confetti.src = '/confetti.png';
+        confetti.className = 'confetti';
+
+        const size = 16 + Math.random() * 32;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${size}px`;
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.top = `${Math.random() * 20 + 10}vh`;
+
+        document.body.appendChild(confetti);
+
+        gsap.to(confetti, {
+          y: 300 + Math.random() * 200,
+          rotation: Math.random() * 360,
+          duration: 1.5 + Math.random(),
+          ease: "power1.out",
+          onComplete: () => confetti.remove()
+        });
+      }
+    }
+
     function playWipe() {
       const wipe = document.createElement('div');
       wipe.className = 'fixed inset-0 bg-purple-700 opacity-0 z-50 pointer-events-none';
@@ -165,30 +194,7 @@
       });
     }
 
-    function launchConfetti() {
-      for (let i = 0; i < 8; i++) {
-        const confetti = document.createElement('img');
-        confetti.src = '/confetti.png';
-        confetti.className = 'confetti';
-
-        const size = 16 + Math.random() * 32;
-        confetti.style.width = `${size}px`;
-        confetti.style.height = `${size}px`;
-
-        confetti.style.left = `${Math.random() * 100}vw`;
-        confetti.style.top = `${Math.random() * 20 + 10}vh`;
-        document.body.appendChild(confetti);
-
-        gsap.to(confetti, {
-          y: 300 + Math.random() * 200,
-          rotation: Math.random() * 360,
-          duration: 1.5 + Math.random(),
-          ease: "power1.out",
-          onComplete: () => confetti.remove()
-        });
-      }
-    }
-
+    // Socket listeners
     socket.on('updatePoll', data => {
       Object.keys(data).forEach(key => updateVote(key, data[key]));
     });
