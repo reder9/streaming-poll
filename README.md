@@ -1,151 +1,96 @@
-# 🎉 Live Poll Viewer (Twitch + TikTok Ready)
+# 🎉 Prize Wheel for TikTok Live
 
-This is a real-time web-based polling app that listens to chat messages from Twitch **and** TikTok channels and displays the results visually on a stylish, responsive webpage. It also includes simulation and reset tools, making it great for streamers to engage with their audience during livestreams.
-
-> 💡 Already supports TikTok and Twitch out of the box!
+A live **Prize Wheel** web app for TikTok live streams where viewers can enter by typing `!ticket` in chat. The wheel dynamically updates as users enter and allows you to spin for a completely random winner. Includes a confetti celebration and glowing winner animation!
 
 ---
 
-## ✨ Features
+## Features
 
-- 🔴 Real-time vote tracking from **Twitch** and **TikTok**
-- 📊 Responsive UI powered by Tailwind CSS and GSAP animations
-- 🧠 Configurable poll options via `poll.json`
-- 🧪 Simulate votes locally
-- 🔄 Reset votes at any time (with wipe and confetti animations)
-- 🔐 Environment-based credential handling
-
----
-
-## 📁 Project Structure
-
-```
-.
-├── public/
-│   ├── index.html      # Frontend UI
-│   ├── poll.json       # Defines poll options
-│   └── confetti.png    # Confetti effect image
-├── server.js           # Express + chat integration
-├── config.js           # Loads .env credentials
-├── .env                # Your Twitch/TikTok creds (ignored by git)
-├── package.json
-└── README.md
-```
+* **Live-updating wheel** – users are added in real time as they enter `!ticket`.
+* **Randomized winner selection** – fully fair and unbiased.
+* **Confetti and animations** – winner text glows and pulses, and confetti celebrates the winner.
+* **Simulation buttons** – test with random entries or reset the wheel.
+* **Clean, modern UI** – styled with TailwindCSS, mobile-friendly.
+* **Customizable colors and styling** – easy to tweak for branding.
 
 ---
 
-## 🛠️ Setup Instructions
+## How to Use
 
-### 1. Clone the repo
+1. **Run the server**
+   Make sure you have `Node.js` installed. Then install dependencies and start the server:
+
+   ```bash
+   npm install
+   node server.js
+   ```
+
+2. **Open the Prize Wheel page**
+   Visit `http://localhost:3000/` (or the port your server is running on) to see the wheel.
+
+3. **Enter the prize wheel**
+
+   * Viewers type `!ticket` in your TikTok live chat.
+   * For testing, click **Simulate Ticket Entry** to add a random user.
+
+4. **Spin the wheel**
+
+   * Click the **SPIN** button.
+   * The wheel animates and randomly selects a winner.
+   * Confetti and glowing text celebrate the winner.
+
+5. **Manage entries**
+
+   * **Reset Wheel** – clears all entries.
+   * **Add Entry (Simulation)** – adds a random test username.
+
+---
+
+## Installation
+
+Clone the repo:
 
 ```bash
-git clone https://github.com/yourusername/live-poll-viewer.git
-cd live-poll-viewer
-```
-
-### 2. Install dependencies
-
-```bash
+git clone https://github.com/reder9/tiktok-prize-picker.git
+cd tiktok-prize-picker
 npm install
-```
-
-### 3. Create a `.env` file
-
-Add your Twitch/TikTok bot credentials in a `.env` file at the root:
-
-```env
-TWITCH_USERNAME=your_twitch_bot_username
-TWITCH_OAUTH=oauth:your_oauth_token
-TWITCH_CHANNEL=your_channel_name
-
-TIKTOK_USERNAME=your_tiktok_bot_username
-TIKTOK_SESSION_ID=your_session_id
-```
-
-> 🔐 Get your Twitch OAuth token at [https://twitchapps.com/tmi/](https://twitchapps.com/tmi/)
-
-### 4. Create a `poll.json` file in the `public` folder
-
-Example structure:
-
-```json
-{
-  "options": [
-    { "id": "option1", "label": "Pizza", "description": "Cheesy goodness" },
-    { "id": "option2", "label": "Tacos", "description": "Crunch or soft?" }
-  ]
-}
-```
-
-IDs should match what chat users will type (`1`, `2`, etc.).
-
----
-
-## 🚀 Running the App
-
-Start the server locally:
-
-```bash
 node server.js
 ```
 
-Open your browser to:
+Dependencies:
+
+* [Node.js](https://nodejs.org/)
+* [Express](https://www.npmjs.com/package/express)
+* [Socket.IO](https://socket.io/)
+* [TailwindCSS](https://tailwindcss.com/)
+* [Canvas Confetti](https://www.npmjs.com/package/canvas-confetti)
+
+---
+
+## File Structure
 
 ```
-http://localhost:3000
+prize-wheel/
+│
+├─ public/
+│  ├─ index.html         # Prize Wheel page
+│  └─ confetti.png       # Optional confetti image (if used)
+│
+├─ server.js             # Node.js + Socket.IO server
+├─ package.json
+└─ README.md
 ```
 
-Votes from both Twitch and TikTok chats will appear in real-time.
+---
+
+## Customization
+
+* **Colors:** Modify the `colors` array in `index.html` to change wheel segment colors.
+* **Wheel size:** Adjust the `<canvas>` width and height.
+* **Animation:** Tweak duration, spins, and easing in the `animateToIndex` function.
 
 ---
 
-## 💬 How Voting Works
+## License
 
-- Viewers type `1`, `2`, etc. in Twitch or TikTok chat.
-- The bot counts votes and updates the UI live using WebSockets.
-
----
-
-## 🔁 Dev Tools
-
-- **Simulate Vote:** Adds a random vote for testing
-- **Reset Poll:** Clears all votes and triggers a page wipe
-
----
-
-## 📦 Environment Variables Summary
-
-| Key                 | Description                          |
-|---------------------|--------------------------------------|
-| `TWITCH_USERNAME`   | Your Twitch bot username             |
-| `TWITCH_OAUTH`      | OAuth token for Twitch               |
-| `TWITCH_CHANNEL`    | Twitch channel to listen to          |
-| `TIKTOK_USERNAME`   | Your TikTok username or bot name     |
-| `TIKTOK_SESSION_ID` | Your TikTok session (cookie string)  |
-
-> ⚠️ Be sure to `.gitignore` your `.env` file.
-
----
-
-## ❤️ Credits & Tech
-
-- [Node.js](https://nodejs.org/)
-- [Express](https://expressjs.com/)
-- [tmi.js](https://tmijs.com/) – Twitch chat
-- [Socket.IO](https://socket.io/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [GSAP](https://greensock.com/gsap/) – animations
-
----
-
-## 🧩 Future Plans
-
-- 📡 Better mobile TikTok support
-- 🧠 Live config editor (in browser)
-- 🖼️ Stream overlays and custom themes
-
----
-
-## 📄 License
-
-MIT – Fork it, improve it, use it on your stream! 🎉
+MIT License – free to use and modify.

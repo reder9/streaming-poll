@@ -2,212 +2,254 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Live Poll</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prize Wheel</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      background-color: #18181b; /* Tailwind zinc-900 */
-      color: white;
+    .glow {
+      box-shadow: 0 0 40px rgba(99,102,241,.25), inset 0 0 40px rgba(99,102,241,.15);
     }
 
-    .vote-count {
-      @apply text-white bg-zinc-700 text-lg font-bold px-4 py-1 rounded text-center;
-      min-width: 3rem;
-      display: inline-block;
-    }
-
-    .vote-animate {
-      animation: flashColor 0.6s ease-in-out;
-    }
-
-    @keyframes flashColor {
-      0%   { background-color: #9333ea; }
-      100% { background-color: #3f3f46; }
-    }
-
-    .top-vote {
-      border: 3px solid #34d399; /* emerald-400 */
-      box-shadow: 0 0 10px #34d399;
-      animation: pulseGlow 2s infinite;
+    h1, #result {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", sans-serif;
+      letter-spacing: -0.02em;
     }
 
     @keyframes pulseGlow {
-      0% { box-shadow: 0 0 10px #34d399; }
-      50% { box-shadow: 0 0 20px #34d399, 0 0 30px #34d399; }
-      100% { box-shadow: 0 0 10px #34d399; }
+      0%,100% { text-shadow:0 0 4px #fff,0 0 8px #fff,0 0 16px #f0f,0 0 24px #f0f; transform: scale(1);}
+      50% { text-shadow:0 0 8px #fff,0 0 16px #fff,0 0 32px #ff0,0 0 48px #ff0; transform: scale(1.15);}
     }
 
-    .confetti {
-      position: fixed;
-      pointer-events: none;
-      z-index: 50;
+    .winnerGlow {
+      animation: pulseGlow 1s ease-in-out infinite;
     }
   </style>
 </head>
 
-<body class="flex flex-col min-h-screen">
-  <!-- Header -->
-  <div class="flex-none px-4 py-4 text-center">
-    <h1 id="pollTitle" class="text-3xl font-bold"></h1>
-    <p id="pollDesc" class="text-zinc-400 mt-1"></p>
+<body class="min-h-screen flex flex-col items-center justify-center p-6
+             bg-gradient-to-br from-purple-900 via-fuchsia-800 to-black
+             text-white">
+  <div class="w-full max-w-md text-center">
+    <h1 class="text-3xl sm:text-4xl font-extrabold mb-6 drop-shadow-lg">
+      🎉 Prize Wheel
+    </h1>
+   <div class="mb-6 p-4 bg-purple-800 rounded-lg border-2 border-fuchsia-500 shadow-lg text-center">
+      <p class="text-xl font-semibold text-white mb-2">
+        🎟️ How to Enter the Prize Wheel
+      </p>
+      <p class="text-lg font-bold">
+        Type 
+        <span class="bg-black text-yellow-300 px-2 py-1 rounded shadow-lg">
+          !ticket
+        </span> 
+        in TikTok live chat
+      </p>
+    </div>
+
+    <div class="relative mx-auto w-80 h-80 sm:w-96 sm:h-96">
+      <canvas id="wheel" width="384" height="384" class="rounded-full glow"></canvas>
+      <div class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2">
+        <div class="w-0 h-0 border-l-[14px] border-r-[14px] border-t-[22px]
+                    border-l-transparent border-r-transparent border-t-yellow-400
+                    drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]">
+        </div>
+      </div>
+      <button id="spinBtn"
+        class="absolute inset-0 m-auto h-14 w-28 rounded-full font-bold tracking-wide
+               bg-fuchsia-600 hover:bg-fuchsia-500 active:bg-fuchsia-700
+               transition-colors shadow-xl">
+        SPIN
+      </button>
+    </div>
+
+    <p id="result" class="mt-6 text-2xl font-semibold min-h-[2.5rem] drop-shadow-lg"></p>
+
+    <div class="flex justify-center gap-4 mt-4" id="debugButtons" style="display:none;">
+      <button id="simulateEntry" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 shadow">
+        Simulate Ticket Entry (Debug Only)
+      </button>
+    </div>
+
+    <!-- Reset Entries is always visible -->
+    <div class="flex justify-center mt-4">
+      <button id="resetEntriesBtn" class="px-4 py-2 rounded bg-red-600 hover:bg-red-500 shadow">
+        Reset Entries
+      </button>
+    </div>
   </div>
 
-  <!-- Poll Options -->
-  <div id="optionsContainer" class="flex-1 overflow-auto px-4 pb-28"></div>
-
-  <!-- Reset Button (Always Visible) -->
-  <div class="fixed top-4 right-4 z-10">
-    <!-- <button id="simulateBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded shadow">
-      Simulate Vote
-    </button> -->
-    <button id="resetBtn" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded shadow">
-      Reset Poll
-    </button>
-  </div>
-
+  <script src="/socket.io/socket.io.js"></script>
   <script>
-    const socket = io();
-    let testPollData = {};
-    let pollOptions = [];
+    const spinBtn = document.getElementById("spinBtn");
+    const resultEl = document.getElementById("result");
+    const simulateEntryBtn = document.getElementById("simulateEntry");
+    const resetEntriesBtn = document.getElementById("resetEntriesBtn");
+    const debugButtonsDiv = document.getElementById("debugButtons");
 
-    fetch('poll.json')
-      .then(res => res.json())
-      .then(data => {
-        pollOptions = data.options;
-        document.getElementById('pollTitle').textContent = data.title || 'Live Poll';
-        document.getElementById('pollDesc').textContent = data.description || '';
-        renderOptions(pollOptions);
-      });
-
-    function renderOptions(options) {
-      const container = document.getElementById('optionsContainer');
-      container.innerHTML = '';
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'grid gap-4 w-full';
-      wrapper.style.gridTemplateColumns = 'repeat(auto-fit, minmax(320px, 1fr))';
-
-      options.forEach((opt, i) => {
-        testPollData[opt.id] = 0;
-        const row = document.createElement('div');
-        row.className = 'flex justify-between items-center bg-zinc-800 p-3 rounded shadow';
-        row.style.minHeight = '70px';
-        row.id = `row-${opt.id}`;
-
-        row.innerHTML = `
-          <div>
-            <div class="text-lg font-bold">[${i + 1}] ${opt.label}</div>
-            ${opt.description ? `<div class="text-sm text-zinc-400">${opt.description}</div>` : ''}
-          </div>
-          <div><span id="${opt.id}" class="vote-count">0</span></div>
-        `;
-
-        wrapper.appendChild(row);
-      });
-
-      container.appendChild(wrapper);
+    // Detect debug mode from URL query ?debug=true
+    const urlParams = new URLSearchParams(window.location.search);
+    const debugMode = urlParams.get('debug') === 'true';
+    if(debugMode) {
+      debugButtonsDiv.style.display = 'flex';
     }
 
-    function updateVote(id, value, skipAnimation = false) {
-      const el = document.getElementById(id);
-      const row = document.getElementById(`row-${id}`);
-      if (el && row && el.textContent !== String(value)) {
-        el.textContent = value;
-        if (!skipAnimation) {
-          row.classList.add('vote-animate');
-          setTimeout(() => row.classList.remove('vote-animate'), 600);
-          launchConfetti();
-        }
+    let entries = [];
+    const colors = ["#F43F5E","#3B82F6","#10B981","#F59E0B","#8B5CF6","#EC4899","#22D3EE","#A3E635"];
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const size = canvas.width;
+    const radius = size / 2;
+    let currentRotation = 0;
+    let spinning = false;
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    function mod(a,n){ return ((a%n)+n)%n; }
+
+    function drawWheel(highlightIndex=null){
+      const n = entries.length;
+      if(n === 0) {
+        ctx.clearRect(0,0,size,size);
+        ctx.beginPath();
+        ctx.arc(radius,radius,radius-1,0,Math.PI*2);
+        ctx.fillStyle="#0F172A";
+        ctx.fill();
+        return;
       }
-      highlightTopVotes();
-    }
 
-    function highlightTopVotes() {
-      const votes = Object.keys(testPollData).map(id => ({
-        id,
-        count: parseInt(document.getElementById(id)?.textContent || '0')
-      }));
+      const seg = Math.PI*2/n;
+      ctx.clearRect(0,0,size,size);
 
-      const maxVote = Math.max(...votes.map(v => v.count));
+      ctx.beginPath();
+      ctx.arc(radius,radius,radius-1,0,Math.PI*2);
+      ctx.lineWidth = 8;
+      ctx.strokeStyle="rgba(255,255,255,0.15)";
+      ctx.stroke();
 
-      votes.forEach(vote => {
-        const row = document.getElementById(`row-${vote.id}`);
-        if (row) {
-          if (vote.count === maxVote && maxVote > 0) {
-            row.classList.add('top-vote');
-          } else {
-            row.classList.remove('top-vote');
-          }
+      for(let i=0;i<n;i++){
+        const start=i*seg, end=start+seg;
+        ctx.beginPath();
+        ctx.moveTo(radius,radius);
+        ctx.arc(radius,radius,radius-8,start,end);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+
+        if(highlightIndex===i){
+          ctx.save();
+          ctx.clip();
+          const grad=ctx.createRadialGradient(radius,radius,10,radius,radius,radius);
+          grad.addColorStop(0,"rgba(255,255,255,0.15)");
+          grad.addColorStop(1,"rgba(255,255,255,0)");
+          ctx.fillStyle=grad;
+          ctx.fillRect(0,0,size,size);
+          ctx.restore();
         }
-      });
-    }
 
-    function launchConfetti() {
-      for (let i = 0; i < 8; i++) {
-        const confetti = document.createElement('img');
-        confetti.src = '/confetti.png';
-        confetti.className = 'confetti';
-
-        const size = 16 + Math.random() * 32;
-        confetti.style.width = `${size}px`;
-        confetti.style.height = `${size}px`;
-        confetti.style.left = `${Math.random() * 100}vw`;
-        confetti.style.top = `${Math.random() * 20 + 10}vh`;
-
-        document.body.appendChild(confetti);
-
-        gsap.to(confetti, {
-          y: 300 + Math.random() * 200,
-          rotation: Math.random() * 360,
-          duration: 1.5 + Math.random(),
-          ease: "power1.out",
-          onComplete: () => confetti.remove()
-        });
+        ctx.save();
+        ctx.translate(radius,radius);
+        ctx.rotate(start + seg/2);
+        ctx.textAlign="right";
+        ctx.fillStyle="white";
+        ctx.font="600 16px Inter, ui-sans-serif, system-ui, sans-serif";
+        ctx.fillText(entries[i], radius-24, 6);
+        ctx.restore();
       }
+
+      ctx.beginPath();
+      ctx.arc(radius,radius,34,0,Math.PI*2);
+      ctx.fillStyle="#0F172A";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(radius,radius,34,0,Math.PI*2);
+      ctx.lineWidth=3;
+      ctx.strokeStyle="rgba(255,255,255,0.25)";
+      ctx.stroke();
     }
 
-    function playWipe() {
-      const wipe = document.createElement('div');
-      wipe.className = 'fixed inset-0 bg-purple-700 opacity-0 z-50 pointer-events-none';
-      document.body.appendChild(wipe);
+    function renderWithRotation(theta, highlightIndex=null){
+      ctx.save();
+      ctx.translate(radius,radius);
+      ctx.rotate(theta);
+      ctx.translate(-radius,-radius);
+      drawWheel(highlightIndex);
+      ctx.restore();
+    }
 
-      gsap.to(wipe, {
-        opacity: 0.4,
-        duration: 0.2,
-        ease: "power1.out",
-        onComplete: () => {
-          gsap.to(wipe, {
-            opacity: 0,
-            duration: 0.5,
-            ease: "power2.in",
-            onComplete: () => wipe.remove()
+    function animateToIndex(targetIndex, winnerName){
+      if(spinning || entries.length===0) return;
+      spinning=true;
+      resultEl.textContent="";
+      spinBtn.disabled=true;
+      spinBtn.classList.add('opacity-50','cursor-not-allowed');
+
+      const spins = Math.floor(Math.random()*3)+5;
+      const seg = Math.PI*2/entries.length;
+      const desiredPointerAngle = (targetIndex + 0.5) * seg;
+      const targetThetaMod = mod(-Math.PI/2 - desiredPointerAngle, Math.PI*2);
+      const currentMod = mod(currentRotation, Math.PI*2);
+      const delta = mod(targetThetaMod - currentMod, Math.PI*2);
+      const targetRotation = currentRotation + spins*Math.PI*2 + delta;
+
+      const duration = 4800;
+      const start = performance.now();
+      const initial = currentRotation;
+
+      function animate(now){
+        const t = Math.min((now-start)/duration,1);
+        const ease = 1 - Math.pow(1-t,3);
+        currentRotation = initial + ease*(targetRotation-initial);
+        renderWithRotation(currentRotation);
+        if(t<1){
+          requestAnimationFrame(animate);
+        } else {
+          spinning=false;
+          currentRotation=mod(currentRotation,Math.PI*2);
+          renderWithRotation(currentRotation,targetIndex);
+          resultEl.innerHTML=`🎯 Winner: <span class="font-bold winnerGlow">${escapeHtml(winnerName)}</span>`;
+          confetti({
+            particleCount:150,
+            spread:70,
+            origin:{y:0.6},
+            colors: colors
           });
+          spinBtn.disabled=false;
+          spinBtn.classList.remove('opacity-50','cursor-not-allowed');
         }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    function renderWheel() {
+      renderWithRotation(currentRotation);
+    }
+
+    spinBtn.addEventListener("click",()=>{
+      if(entries.length===0) return;
+      const winnerIndex = Math.floor(Math.random()*entries.length);
+      const winnerName = entries[winnerIndex];
+      animateToIndex(winnerIndex, winnerName);
+    });
+
+    if(debugMode){
+      simulateEntryBtn.addEventListener("click",()=>{
+        const randomUser = "User" + Math.floor(Math.random()*1000);
+        if(!entries.includes(randomUser)) entries.push(randomUser);
+        renderWheel();
       });
     }
 
-    // Always active reset button
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      Object.keys(testPollData).forEach(id => {
-        testPollData[id] = 0;
-        updateVote(id, 0, true);
-      });
-      socket.emit('resetPoll');
-      playWipe();
+    resetEntriesBtn.addEventListener("click",()=>{
+      entries = [];
+      currentRotation = 0;
+      resultEl.textContent="";
+      renderWheel();
     });
 
-    // Socket listener
-    socket.on('updatePoll', data => {
-      Object.keys(data).forEach(key => updateVote(key, data[key]));
-    });
+    renderWheel();
   </script>
 </body>
 </html>
